@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Risk Prediction - Learning Gap Connectivity</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .message {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        .prediction-result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        .risk-badge {
+            display: inline-block;
+            padding: 14px 28px;
+            border-radius: 28px;
+            font-weight: 800;
+            font-size: 1.45rem;
+            margin-bottom: 18px;
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        }
+        .risk-message {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .recommendations {
+            background: rgba(255,255,255,0.08);
+            padding: 22px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .recommendations h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        .recommendations ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .recommendations li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        .recommendations li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Student Risk Prediction</h1>
+            <p>Analyze student learning gaps and predict risk levels</p>
+        </div>
+        
+        {% if message %}
+            <div class="message {{ message_type }}">
+                {{ message }}
+            </div>
+        {% endif %}
+        
+        <div class="form-container">
+            <form method="POST" class="upload-form">
+                <div class="form-group">
+                    <label for="student_name">Student Name:</label>
+                    <input type="text" id="student_name" name="student_name" placeholder="e.g., John Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="class_name">Class:</label>
+                    <input type="text" id="class_name" name="class_name" placeholder="e.g., Class 10A" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="days_absent">Days Absent:</label>
+                        <input type="number" id="days_absent" name="days_absent" min="0" placeholder="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="missed_topics">Missed Topics:</label>
+                        <input type="number" id="missed_topics" name="missed_topics" min="0" placeholder="0" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="avg_marks">Average Marks (%):</label>
+                        <input type="number" id="avg_marks" name="avg_marks" min="0" max="100" placeholder="0-100" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="difficulty_score">Difficulty Score (1-10):</label>
+                        <input type="number" id="difficulty_score" name="difficulty_score" min="1" max="10" placeholder="1-10" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">🔮 Predict Risk Level</button>
+                    <a href="/" class="btn btn-secondary">🏠 Go Home</a>
+                </div>
+            </form>
+        </div>
+
+        {% if prediction and risk_info %}
+        <div class="prediction-result" style="background-color: {{ risk_info.color }};">
+            <div class="risk-badge">
+                {{ prediction }}
+            </div>
+            <div class="risk-message">
+                {{ risk_info.message }}
+            </div>
+            <div class="recommendations">
+                <h4>Recommended Actions:</h4>
+                <ul>
+                    {% for rec in risk_info.recommendations %}
+                    <li>{{ rec }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

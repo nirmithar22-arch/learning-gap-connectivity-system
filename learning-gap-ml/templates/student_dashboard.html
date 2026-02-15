@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Student Dashboard</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+        .nav-link {
+            color: white !important;
+        }
+        .nav-link:hover {
+            color: #e0e0e0 !important;
+        }
+        .page-header {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-upload {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .btn-upload:hover {
+            color: white;
+            transform: scale(1.05);
+        }
+        .materials-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .materials-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .material-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #667eea;
+        }
+        .material-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .btn-download {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .btn-download:hover {
+            background: #764ba2;
+            color: white;
+        }
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .badge-low {
+            background-color: #28a745;
+        }
+        .badge-medium {
+            background-color: #ffc107;
+            color: black;
+        }
+        .badge-high {
+            background-color: #dc3545;
+        }
+        .progress {
+            height: 25px;
+        }
+        .table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-back:hover {
+            color: white;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="/">📚 Learning Gap Connectivity System</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/student/dashboard">Student Dashboard</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="page-header">
+            <h1>Student Dashboard</h1>
+            <p class="text-muted">Monitor attendance, progress, and risk indicators</p>
+        </div>
+
+        <!-- Filter / Student Login Section -->
+        <div class="filter-section">
+            <form method="get" action="/student/dashboard" style="display:flex; align-items:center; gap:12px; width:100%;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <label for="classDropdown"><strong>Select Class:</strong></label>
+                    <select class="form-control d-inline-block w-auto" id="classDropdown" name="class" onchange="this.form.submit()" style="margin-left: 10px;">
+                        <option value="8" {% if selected_class == '8' %}selected{% endif %}>Class 8</option>
+                        <option value="9" {% if selected_class == '9' %}selected{% endif %}>Class 9</option>
+                        <option value="10" {% if selected_class == '10' %}selected{% endif %}>Class 10</option>
+                    </select>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <label for="rollInput"><strong>Enter Roll:</strong></label>
+                    <input type="text" id="rollInput" name="roll" class="form-control" placeholder="e.g., 801" value="{{ current_student.roll_number if current_student else '' }}" style="width:160px;">
+                    <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border:none;">Load Profile</button>
+                </div>
+
+                <div style="margin-left:auto;">
+                    <a href="/student/upload/{{ selected_class }}" class="btn-upload">Submit Assignment</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Uploaded Materials Section -->
+        <div class="materials-section">
+            <h3>📚 Uploaded Materials</h3>
+            {% if materials %}
+                <div>
+                    {% for material in materials %}
+                    <div class="material-item">
+                        <div>
+                            <span class="material-name">📄 {{ material.title }}</span>
+                            <small style="display: block; color: #666; margin-top: 5px;">Subject: {{ material.subject }} | Uploaded: {{ material.uploaded_date.strftime('%d-%m-%Y') }}</small>
+                        </div>
+                        <a href="/uploads/{{ selected_class }}/{{ material.filename }}" class="btn-download" download>Download</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No materials uploaded yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Student's Own Progress Section -->
+        {% if current_student %}
+        <div class="materials-section">
+            <h3>📊 Your Progress & Submissions</h3>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                <p><strong>Name:</strong> {{ current_student.name }}</p>
+                <p><strong>Roll Number:</strong> {{ current_student.roll_number }}</p>
+                <p><strong>Attendance:</strong> <span class="badge {% if current_student.attendance == 'Present' %}badge-success{% else %}badge-danger{% endif %}">{{ current_student.attendance }}</span></p>
+                <p><strong>Progress:</strong> 
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: {{ current_student.progress }}%;" aria-valuenow="{{ current_student.progress }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ current_student.progress }}%
+                        </div>
+                    </div>
+                </p>
+                <p><strong>Risk Level:</strong> <span class="badge badge-{{ current_student.risk_level|lower }}">{{ current_student.risk_level }} Risk</span></p>
+            </div>
+
+            <h4>Your Submissions</h4>
+            {% if student_submissions %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Assignment Title</th>
+                            <th>Subject</th>
+                            <th>Submitted Date</th>
+                            <th>File</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for submission in student_submissions %}
+                        <tr>
+                            <td>{{ submission.assignment_title }}</td>
+                            <td>{{ submission.subject }}</td>
+                            <td>{{ submission.submitted_date.strftime('%d-%m-%Y %H:%M') }}</td>
+                            <td><a href="/uploads/class_{{ submission.class_id }}_submissions/{{ submission.filename }}" download class="btn btn-sm btn-info">Download</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No submissions yet.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Student list removed: student sees only their own progress -->
+
+        <!-- Back Button -->
+        <div class="mt-5 text-center">
+            <a href="/" class="btn-back">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        function filterByClass() {
+            const selectedClass = document.getElementById('classDropdown').value;
+            window.location.href = `/student/dashboard?class=${selectedClass}`;
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #28a745;
+            color: white;
+            border-radius: 5px;
+        }
+        .dashboard-header h1 {
+            margin: 0;
+        }
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #218838;
+        }
+        .search-bar {
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .container-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .progress-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 5px 0;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: #28a745;
+            transition: width 0.3s;
+        }
+        .at-risk {
+            border-left: 4px solid #dc3545;
+            background: #fff5f5;
+        }
+        .assignment-list {
+            margin-top: 15px;
+        }
+        .assignment-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ffc107;
+        }
+        .assignment-item.submitted {
+            border-left-color: #28a745;
+        }
+        .assignment-due {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        @media (max-width: 768px) {
+            .container-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <h1>🎓 Student Dashboard</h1>
+        <div>
+            <span style="margin-right: 20px;">Welcome, {{ user['name'] }} (Class: {{ user['class_name'] }})!</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="search-bar">
+            <form action="{{ url_for('search') }}" method="GET">
+                <input type="text" class="search-input" name="q" placeholder="🔍 Search learning materials..." required>
+            </form>
+        </div>
+        
+        <div class="container-grid">
+            <!-- Learning Materials -->
+            <div class="card">
+                <h3>📚 Learning Materials</h3>
+                <p>Access and download study materials shared by your teacher</p>
+                <form method="POST" action="{{ url_for('student') }}" style="margin-bottom: 15px;">
+                    <input type="hidden" name="class_name" value="{{ user['class_name'] }}">
+                    <select name="subject" required style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                        <option value="">Select a subject...</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Science">Science</option>
+                        <option value="English">English</option>
+                        <option value="History">History</option>
+                        <option value="Geography">Geography</option>
+                    </select>
+                    <button type="submit" class="btn">Browse Materials</button>
+                </form>
+            </div>
+            
+            <!-- Progress Tracking -->
+            <div class="card">
+                <h3>📊 Your Progress</h3>
+                {% if progress %}
+                    {% for subject in progress %}
+                        <div class="progress-item {% if subject['assessment_score'] and subject['assessment_score'] < 60 %}at-risk{% endif %}">
+                            <div style="flex: 1;">
+                                <strong>{{ subject['subject'] }}</strong>
+                                {% if subject['assessment_score'] %}
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" style="width: {{ subject['assessment_score'] }}%"></div>
+                                    </div>
+                                    <small>Score: {{ subject['assessment_score'] }}%</small>
+                                {% endif %}
+                                {% if subject['assessment_score'] and subject['assessment_score'] < 60 %}
+                                    <small style="color: #dc3545;"> ⚠️ Needs improvement</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: #666;">No progress tracked yet. Start accessing materials to build your profile!</p>
+                {% endif %}
+            </div>
+            
+            <!-- Assignments -->
+            <div class="card">
+                <h3>✅ Your Assignments</h3>
+                {% if assignments %}
+                    <div class="assignment-list">
+                        {% for assignment in assignments %}
+                            <div class="assignment-item">
+                                <strong>{{ assignment['title'] }}</strong>
+                                <p style="margin: 5px 0;">{{ assignment['description'] or 'No description' }}</p>
+                                <div class="assignment-due">
+                                    📅 Due: {{ assignment['due_date'] }} | 
+                                    <strong>{{ assignment['subject'] }}</strong>
+                                </div>
+                                <a href="{{ url_for('submit_assignment_route', assignment_id=assignment['id']) }}" class="btn" style="margin-top: 10px; display: inline-block;">Submit</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: #666;">No assignments yet. Check back soon!</p>
+                {% endif %}
+            </div>
+            
+            <!-- At-Risk Subjects -->
+            <div class="card">
+                <h3>⚠️ Areas for Improvement</h3>
+                {% if at_risk_subjects %}
+                    <p>These subjects need your attention:</p>
+                    {% for subject in at_risk_subjects %}
+                        <div class="progress-item at-risk">
+                            <div>
+                                <strong>{{ subject['subject'] }}</strong><br>
+                                <small>Current Score: {{ subject['assessment_score'] }}%</small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <p style="font-size: 12px; color: #666; margin-top: 15px;">💡 <strong>Tip:</strong> Review the recommended learning materials for these subjects to improve your understanding.</p>
+                {% else %}
+                    <p style="color: #28a745;">✓ Great job! All your subjects are on track!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

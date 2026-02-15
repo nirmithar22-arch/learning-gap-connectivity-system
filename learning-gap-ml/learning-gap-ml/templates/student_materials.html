@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Materials</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .materials-header {
+            background: #28a745;
+            color: white;
+            padding: 30px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .materials-header h1 {
+            margin: 0;
+        }
+        .search-form {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .search-form form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .btn {
+            align-self: flex-end;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn:hover {
+            background: #218838;
+        }
+        .materials-list {
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .date-section {
+            margin-bottom: 30px;
+        }
+        .date-header {
+            background: #f8f9fa;
+            padding: 12px;
+            border-left: 4px solid #28a745;
+            margin-bottom: 15px;
+            border-radius: 3px;
+            font-weight: 600;
+            color: #333;
+        }
+        .file-item {
+            padding: 12px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: box-shadow 0.3s;
+        }
+        .file-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        .file-icon {
+            font-size: 20px;
+        }
+        .file-name {
+            color: #333;
+            font-weight: 500;
+        }
+        .file-size {
+            font-size: 12px;
+            color: #999;
+        }
+        .download-btn {
+            padding: 8px 15px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 13px;
+            transition: background 0.3s;
+        }
+        .download-btn:hover {
+            background: #218838;
+        }
+        .no-materials {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .back-link {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .back-link a {
+            color: #28a745;
+            text-decoration: none;
+        }
+        @media (max-width: 768px) {
+            .search-form form {
+                grid-template-columns: 1fr;
+            }
+            .btn {
+                align-self: auto;
+            }
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .download-btn {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="materials-header">
+            <h1>📚 Learning Materials</h1>
+            <p style="margin: 10px 0 0 0;">Class: {{ user['class_name'] }}</p>
+        </div>
+        
+        <div class="search-form">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="subject">Select Subject</label>
+                    <select id="subject" name="subject" required>
+                        <option value="">Choose a subject...</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Science">Science</option>
+                        <option value="English">English</option>
+                        <option value="History">History</option>
+                        <option value="Geography">Geography</option>
+                        <option value="Computer Science">Computer Science</option>
+                    </select>
+                </div>
+                <div style="display: flex;"></div>
+                <button type="submit" class="btn">📥 Browse Materials</button>
+            </form>
+        </div>
+        
+        {% if content_list %}
+            <div class="materials-list">
+                {% for section in content_list %}
+                    <div class="date-section">
+                        <div class="date-header">📅 {{ section['date'] }}</div>
+                        
+                        {% for file in section['files'] %}
+                            <div class="file-item">
+                                <div class="file-info">
+                                    <span class="file-icon">📄</span>
+                                    <div>
+                                        <div class="file-name">{{ file['name'] }}</div>
+                                        <div class="file-size">{{ file['path'] }}</div>
+                                    </div>
+                                </div>
+                                <a href="{{ url_for('download_file', filepath=file['path']) }}" class="download-btn">⬇️ Download</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-materials">
+                <h3>No materials available yet</h3>
+                <p>Select a subject to browse available materials, or check back later for new uploads.</p>
+            </div>
+        {% endif %}
+        
+        <div class="back-link">
+            <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

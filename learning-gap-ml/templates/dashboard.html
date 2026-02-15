@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Teacher Dashboard</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+        .nav-link {
+            color: white !important;
+        }
+        .nav-link:hover {
+            color: #e0e0e0 !important;
+        }
+        .page-header {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .card .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px 10px 0 0;
+        }
+        .card .card-body {
+            padding: 30px;
+        }
+        .card-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn-back:hover {
+            color: white;
+            transform: scale(1.05);
+        }
+        .btn-upload {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .btn-upload:hover {
+            color: white;
+            transform: scale(1.05);
+        }
+        .progress {
+            height: 25px;
+        }
+        .btn-sm {
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="/">📚 Learning Gap Connectivity System</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/teacher/dashboard">Teacher Dashboard</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="page-header">
+            <h1>Teacher Dashboard - Class {{ selected_class }}</h1>
+            <p class="text-muted">Monitor student progress and attendance for selected class</p>
+        </div>
+
+        <!-- Filter and Upload Section -->
+        <div class="filter-section">
+            <div>
+                <label for="classDropdown"><strong>Select Class:</strong></label>
+                <select class="form-control d-inline-block w-auto" id="classDropdown" onchange="filterByClass()" style="margin-left: 10px;">
+                    <option value="8" {% if selected_class == '8' %}selected{% endif %}>Class 8</option>
+                    <option value="9" {% if selected_class == '9' %}selected{% endif %}>Class 9</option>
+                    <option value="10" {% if selected_class == '10' %}selected{% endif %}>Class 10</option>
+                </select>
+            </div>
+            <a href="/teacher/upload/{{ selected_class }}" class="btn-upload">Upload Materials</a>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header">Total Students in Class {{ selected_class }}</div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ total_students }}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header">Present Today</div>
+                    <div class="card-body">
+                        <h5 class="card-title" style="color: #28a745;">{{ present_today }}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header">Absent Today</div>
+                    <div class="card-body">
+                        <h5 class="card-title" style="color: #dc3545;">{{ absent_today }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student List Table -->
+        <div class="table-container">
+            <h3 class="mb-4">Students in Class {{ selected_class }}</h3>
+            {% if students %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Roll Number</th>
+                            <th>Name</th>
+                            <th>Attendance</th>
+                            <th>Risk Level</th>
+                            <th>Progress</th>
+                            <th>Last Active</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td><strong>{{ student.roll_number }}</strong></td>
+                            <td>{{ student.name }}</td>
+                            <td>
+                                <a href="/teacher/edit/{{ student.id }}" class="btn btn-sm {% if student.attendance == 'Present' %}btn-success{% else %}btn-danger{% endif %}">
+                                    {{ student.attendance }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge badge-{{ student.risk_level|lower }}">
+                                    {{ student.risk_level }} Risk
+                                </span>
+                            </td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ student.progress }}%;" aria-valuenow="{{ student.progress }}" aria-valuemin="0" aria-valuemax="100">
+                                        {{ student.progress }}%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ student.last_active.strftime('%Y-%m-%d') if student.last_active else 'N/A' }}</td>
+                            <td>
+                                <a href="/teacher/edit/{{ student.id }}" class="btn btn-sm btn-warning">Edit</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                No students found for Class {{ selected_class }}.
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Assignments Submitted Section -->
+        <div class="table-container">
+            <h3 class="mb-4">📝 Assignment Submissions</h3>
+            {% if assignments %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Roll Number</th>
+                            <th>Student Name</th>
+                            <th>Assignment Title</th>
+                            <th>Subject</th>
+                            <th>Submitted Date</th>
+                            <th>File</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assignment in assignments %}
+                        <tr>
+                            <td><strong>{{ assignment.roll_number }}</strong></td>
+                            <td>{{ assignment.student_name }}</td>
+                            <td>{{ assignment.assignment_title }}</td>
+                            <td>{{ assignment.subject }}</td>
+                            <td>{{ assignment.submitted_date.strftime('%d-%m-%Y %H:%M') }}</td>
+                            <td><a href="/uploads/class_{{ assignment.class_id }}_submissions/{{ assignment.filename }}" download class="btn btn-sm btn-info">Download</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                No assignments submitted yet.
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-5 text-center">
+            <a href="/" class="btn-back">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        function filterByClass() {
+            const selectedClass = document.getElementById('classDropdown').value;
+            window.location.href = `/teacher/dashboard?class=${selectedClass}`;
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

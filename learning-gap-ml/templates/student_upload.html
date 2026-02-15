@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Student Submission Portal</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+        .nav-link {
+            color: white !important;
+        }
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .form-container h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #333;
+        }
+        .upload-area {
+            border: 2px dashed #667eea;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        .upload-area:hover {
+            background: #e8eaf6;
+            border-color: #764ba2;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 10px 30px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="/">📚 Learning Gap Connectivity System</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/student/dashboard">Student Dashboard</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="form-container">
+            <h2>📝 Submit Assignment - Class {{ class_id }}</h2>
+            <p class="text-muted">Upload your completed assignments or project work</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{% if category == 'success' %}success{% else %}danger{% endif %} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="student_name">Your Name:</label>
+                    <input type="text" class="form-control" id="student_name" name="student_name" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="roll_number">Roll Number:</label>
+                    <input type="text" class="form-control" id="roll_number" name="roll_number" placeholder="Enter your roll number" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="assignment">Assignment/Work Title:</label>
+                    <input type="text" class="form-control" id="assignment" name="assignment" placeholder="e.g., Chapter 5 Exercise" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Subject:</label>
+                    <select class="form-control" id="subject" name="subject" required>
+                        <option value="">-- Select Subject --</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Science">Science</option>
+                        <option value="English">English</option>
+                        <option value="Social Science">Social Science</option>
+                        <option value="Kannada">Kannada</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Comments (Optional):</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Add any comments about your submission..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Upload Your Work:</label>
+                    <div class="upload-area" onclick="document.getElementById('file').click();">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">📎</div>
+                        <p><strong>Click to upload or drag and drop</strong></p>
+                        <p style="font-size: 0.9rem; color: #666;">Supported formats: PDF, TXT, DOC, DOCX, Images (PNG, JPG, JPEG)</p>
+                    </div>
+                    <input type="file" id="file" name="file" style="display: none;" accept=".pdf,.txt,.doc,.docx,.png,.jpg,.jpeg" required onchange="updateFileName(this)">
+                    <p id="fileName" style="margin-top: 10px; color: #667eea;"></p>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-block">Submit Assignment</button>
+                </div>
+                <div class="form-group">
+                    <a href="/student/dashboard?class={{ class_id }}" class="btn btn-secondary btn-block">Back to Dashboard</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function updateFileName(input) {
+            if (input.files && input.files[0]) {
+                document.getElementById('fileName').textContent = 'Selected: ' + input.files[0].name;
+            }
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics - Teacher Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .analytics-header {
+            background: #667eea;
+            color: white;
+            padding: 30px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .analytics-header h1 {
+            margin: 0;
+        }
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .assignment-analytics {
+            background: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .assignment-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .assignment-row:last-child {
+            border-bottom: none;
+        }
+        .assignment-info {
+            flex: 1;
+        }
+        .assignment-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .assignment-meta {
+            font-size: 13px;
+            color: #999;
+        }
+        .progress-bar-container {
+            flex: 1;
+            margin: 0 30px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: #28a745;
+            transition: width 0.3s;
+        }
+        .submission-stats {
+            text-align: right;
+            min-width: 100px;
+            color: #666;
+            font-size: 14px;
+        }
+        .back-link {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        @media (max-width: 768px) {
+            .assignment-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .progress-bar-container {
+                margin: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="analytics-header">
+            <h1>📊 Class Analytics</h1>
+            <p style="margin: 10px 0 0 0;">Track assignment submissions and student engagement</p>
+        </div>
+        
+        {% if analytics_data %}
+            <div class="analytics-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Assignments</div>
+                    <div class="stat-value">{{ analytics_data|length }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Submissions</div>
+                    <div class="stat-value">{{ analytics_data|map(attribute='total_students')|sum }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Completion Rate</div>
+                    <div class="stat-value">
+                        {% set total_subs = analytics_data|map(attribute='total_students')|sum %}
+                        {% set submitted = analytics_data|map(attribute='submitted')|sum %}
+                        {% if total_subs > 0 %}
+                            {{ ((submitted / total_subs) * 100)|int }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <h2>Assignment Details</h2>
+            
+            {% for item in analytics_data %}
+                <div class="assignment-analytics">
+                    <div class="assignment-row">
+                        <div class="assignment-info">
+                            <div class="assignment-title">{{ item['assignment']['title'] }}</div>
+                            <div class="assignment-meta">
+                                Subject: {{ item['assignment']['subject'] }} | 
+                                Due: {{ item['assignment']['due_date'] }}
+                            </div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" 
+                                     style="width: {% if item['total_students'] > 0 %}{{ (item['submitted'] / item['total_students'] * 100)|int }}{% else %}0{% endif %}%">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="submission-stats">
+                            <strong>{{ item['submitted'] }}/{{ item['total_students'] }}</strong> submitted
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="background: white; padding: 40px; text-align: center; border-radius: 5px;">
+                <h3 style="color: #666;">No assignments yet</h3>
+                <p>Create assignments to see analytics here.</p>
+            </div>
+        {% endif %}
+        
+        <div class="back-link">
+            <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

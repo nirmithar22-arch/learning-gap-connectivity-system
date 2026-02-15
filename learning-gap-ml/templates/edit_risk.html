@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Edit Student</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+        }
+        .form-container h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #333;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 10px 30px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .student-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Edit Student Information</h2>
+        
+        <div class="student-info">
+            <p><strong>Student:</strong> {{ student.name }}</p>
+            <p><strong>Roll Number:</strong> {{ student.roll_number }}</p>
+            <p><strong>Class:</strong> {{ student.student_class }}</p>
+        </div>
+
+        <form method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="attendance">Attendance:</label>
+                    <select class="form-control" id="attendance" name="attendance" required>
+                        <option value="Present" {% if student.attendance == 'Present' %}selected{% endif %}>Present</option>
+                        <option value="Absent" {% if student.attendance == 'Absent' %}selected{% endif %}>Absent</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="risk_level">Risk Level:</label>
+                    <select class="form-control" id="risk_level" name="risk_level" required>
+                        <option value="Low" {% if student.risk_level == 'Low' %}selected{% endif %}>Low Risk (Green)</option>
+                        <option value="Medium" {% if student.risk_level == 'Medium' %}selected{% endif %}>Medium Risk (Yellow)</option>
+                        <option value="High" {% if student.risk_level == 'High' %}selected{% endif %}>High Risk (Red)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary btn-block">Update Student</button>
+            </div>
+            <div class="form-group">
+                <a href="/teacher/dashboard?class={{ student.student_class }}" class="btn btn-secondary btn-block">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

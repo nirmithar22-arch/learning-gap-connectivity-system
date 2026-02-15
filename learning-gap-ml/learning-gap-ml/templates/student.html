@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student View - Learning Gap Connectivity</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👨‍🎓 Student Learning Portal</h1>
+            <p>Access educational materials shared by your teachers</p>
+        </div>
+        
+        <div class="form-container">
+            <form method="POST" class="search-form">
+                <h3>Find Materials</h3>
+                <div class="form-group">
+                    <label for="class_name">Select Class:</label>
+                    <select id="class_name" name="class_name" required>
+                        <option value="">-- Select class --</option>
+                        <option value="ALL">-- All Classes --</option>
+                        {% if classes_subjects %}
+                            {% for cls in classes_subjects.keys() %}
+                                <option value="{{ cls }}">{{ cls }}</option>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Select Subject:</label>
+                    <select id="subject" name="subject" required>
+                        <option value="">-- Select subject --</option>
+                        <option value="ALL">-- All Subjects --</option>
+                    </select>
+                    <div style="margin-top:8px; font-size:0.95em; color:#555">
+                        <label><input type="checkbox" id="union_subjects"> Show subjects from all classes</label>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">🔍 Search Materials</button>
+                    <a href="/" class="btn btn-secondary">🏠 Go Home</a>
+                </div>
+            </form>
+        </div>
+        
+        {% if content_list %}
+            <div class="results-container">
+                <h2>📚 Available Materials</h2>
+                {% for item in content_list %}
+                    <div class="content-card">
+                        <div class="date-header">📅 {{ item.date }}</div>
+                        <div class="file-list">
+                            {% for file in item.files %}
+                                <div class="file-item">
+                                    <span class="file-icon">📄</span>
+                                    <a href="{{ url_for('download_file', filepath=file.path) }}" class="file-link" download>
+                                        {{ file.name }}
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% elif content_list is not none %}
+            <div class="no-content">
+                <p>❌ No materials found for this class/subject.</p>
+                <p>Please check if the class name and subject are correct.</p>
+            </div>
+        {% endif %}
+    </div>
+    <script>
+        const classesSubjects = {{ classes_subjects | tojson }} || {};
+        const classSelect = document.getElementById('class_name');
+        const subjectSelect = document.getElementById('subject');
+        const unionCheckbox = document.getElementById('union_subjects');
+
+        function updateSubjects() {
+            const cls = classSelect.value;
+            // include All Subjects option at top
+            subjectSelect.innerHTML = '<option value="">-- Select subject --</option><option value="ALL">-- All Subjects --</option>';
+            // If union checkbox checked or class is ALL, populate union of all subjects
+            if (unionCheckbox && unionCheckbox.checked) {
+                const set = new Set();
+                Object.values(classesSubjects).forEach(arr => arr.forEach(s => set.add(s)));
+                Array.from(set).sort().forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s;
+                    opt.textContent = s;
+                    subjectSelect.appendChild(opt);
+                });
+                return;
+            }
+
+            if (!cls || cls === 'ALL' || !classesSubjects[cls]) return;
+            classesSubjects[cls].forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = s;
+                subjectSelect.appendChild(opt);
+            });
+        }
+
+        // if page preselects a class (optional) populate subjects on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSubjects();
+        });
+
+        classSelect && classSelect.addEventListener('change', updateSubjects);
+        unionCheckbox && unionCheckbox.addEventListener('change', updateSubjects);
+    </script>
+</body>
+</html>

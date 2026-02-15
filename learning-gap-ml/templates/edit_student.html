@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Edit Student</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+        }
+        .form-container h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+        .form-group label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 10px 30px;
+            border-radius: 20px;
+            font-weight: bold;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 20px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .student-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+        .student-info p {
+            margin-bottom: 10px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Edit Student</h2>
+        
+        <div class="student-info">
+            <p><strong>Name:</strong> {{ student.name }}</p>
+            <p><strong>Roll Number:</strong> {{ student.roll_number }}</p>
+            <p><strong>Class:</strong> {{ student.student_class }}</p>
+        </div>
+
+        <form method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="attendance">Attendance Status:</label>
+                    <select class="form-control" id="attendance" name="attendance" required>
+                        <option value="Present" {% if student.attendance == 'Present' %}selected{% endif %}>Present</option>
+                        <option value="Absent" {% if student.attendance == 'Absent' %}selected{% endif %}>Absent</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="risk_level">Risk Level:</label>
+                    <select class="form-control" id="risk_level" name="risk_level" required>
+                        <option value="Low" {% if student.risk_level == 'Low' %}selected{% endif %}>Low Risk</option>
+                        <option value="Medium" {% if student.risk_level == 'Medium' %}selected{% endif %}>Medium Risk</option>
+                        <option value="High" {% if student.risk_level == 'High' %}selected{% endif %}>High Risk</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4">Update Student</button>
+            <a href="/teacher/dashboard?class={{ student.student_class }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

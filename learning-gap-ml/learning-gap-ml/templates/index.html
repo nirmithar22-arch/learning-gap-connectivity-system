@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Gap Connectivity System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height:100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .home-header { text-align:center; padding:60px 20px 40px; color:white; }
+        .home-header h1 { font-size:42px; margin-bottom:8px; }
+        .home-header p { font-size:16px; opacity:0.95 }
+        .cards-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; max-width:1000px; margin:40px auto; padding:0 20px }
+        .card { background:white; border-radius:10px; padding:32px; text-align:center; box-shadow:0 6px 26px rgba(0,0,0,0.10); }
+        .card h2 { color:#667eea; margin-bottom:12px; font-size:2rem; }
+        .card p { color:#555; margin-bottom:18px; font-size:1.15rem; }
+        .card a { display:inline-block; padding:12px 24px; background:#667eea; color:#fff; text-decoration:none; border-radius:8px; font-size:1.05rem; }
+        .card a:hover { background:#5a63d8 }
+    </style>
+</head>
+<body>
+    <div class="home-header">
+        <h1>📚 Learning Gap Connectivity System</h1>
+        <p>Connect teachers and students for better learning outcomes</p>
+    </div>
+
+    <div class="cards-container">
+        <div class="card">
+            <h2>👨‍🏫 Teacher Portal</h2>
+            <p>Upload and manage lesson notes, files and assignments.</p>
+            <a href="{{ url_for('teacher') }}">Open Teacher Portal</a>
+        </div>
+
+        <div class="card">
+            <h2>👨‍🎓 Student Portal</h2>
+            <p>Browse class materials and submit assignments.</p>
+            <a href="{{ url_for('student') }}">Open Student Portal</a>
+        </div>
+
+        <div class="card">
+            <h2>📊 Risk Prediction</h2>
+            <p>Estimate students' risk and get intervention recommendations.</p>
+            <a href="{{ url_for('risk_prediction') }}">Open Risk Tool</a>
+        </div>
+    </div>
+</body>
+</html>

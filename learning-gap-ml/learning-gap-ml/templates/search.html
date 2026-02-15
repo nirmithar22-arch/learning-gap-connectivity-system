@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - Learning Gap System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .search-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .search-header h1 {
+            margin: 0 0 20px 0;
+        }
+        .search-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .search-form form {
+            display: flex;
+            gap: 10px;
+        }
+        .search-form input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid white;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .search-form button {
+            padding: 12px 25px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .search-form button:hover {
+            background: #f0f0f0;
+        }
+        .container-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .results-section {
+            margin-bottom: 40px;
+        }
+        .results-count {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .result-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .result-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .result-path {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+        .result-type {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            font-size: 12px;
+            color: #666;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background: #5568d3;
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .popular-searches {
+            background: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .popular-searches h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .search-tag {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            color: #667eea;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .search-tag:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-header">
+        <h1>🔍 Search Learning Materials</h1>
+        <div class="search-form">
+            <form method="GET">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search materials, topics, subjects...">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="container-wrapper">
+        {% if query %}
+            <div class="results-section">
+                <h2>Search Results</h2>
+                
+                {% if results %}
+                    <div class="results-count">Found {{ results|length }} result(s) for "{{ query }}"</div>
+                    
+                    {% for result in results %}
+                        <div class="result-item">
+                            <div class="result-name">{{ result['name'] }}</div>
+                            <div class="result-path">📂 {{ result['path'] }}</div>
+                            <span class="result-type">{{ result['type'].upper() }}</span>
+                            <a href="{{ url_for('download_file', filepath=result['path']) }}" class="btn">📥 Download</a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-results">
+                        <h3>No results found</h3>
+                        <p>Try searching with different keywords or explore other subjects.</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <h2>Popular Searches</h2>
+        {% endif %}
+        
+        {% if popular_searches %}
+            <div class="popular-searches">
+                <h3>📌 Trending Searches</h3>
+                {% for search in popular_searches %}
+                    <a href="{{ url_for('search', q=search['query']) }}" class="search-tag">
+                        {{ search['query'] }} ({{ search['count'] }})
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="{{ url_for('dashboard') }}" style="color: #667eea; text-decoration: none;">← Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

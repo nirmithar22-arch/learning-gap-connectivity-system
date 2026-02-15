@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Submissions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .container-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: #667eea;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .submission-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .student-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .submission-meta {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .submission-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .btn {
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-right: 10px;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #5568d3;
+        }
+        .btn-download {
+            background: #28a745;
+        }
+        .btn-download:hover {
+            background: #218838;
+        }
+        .no-submissions {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .back-link {
+            margin-top: 20px;
+        }
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-wrapper">
+        <div class="header">
+            <h1>📋 Submissions for "{{ assignment['title'] }}"</h1>
+            <p style="margin: 10px 0 0 0;">Due: {{ assignment['due_date'] }} | Subject: {{ assignment['subject'] }}</p>
+        </div>
+        
+        {% if submissions %}
+            <h3>Total Submissions: {{ submissions|length }}</h3>
+            
+            {% for submission in submissions %}
+                <div class="submission-card">
+                    <div class="student-name">{{ submission['student_name'] }}</div>
+                    <div class="submission-meta">
+                        📅 Submitted: {{ submission['submitted_at'] }} | Status: <strong>{{ submission['status'] }}</strong>
+                    </div>
+                    
+                    {% if submission['submission_text'] %}
+                        <div style="margin-bottom: 15px;">
+                            <strong>Text Submission:</strong>
+                            <div class="submission-content">
+                                {{ submission['submission_text'] }}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if submission['file_path'] %}
+                        <div>
+                            <strong>File:</strong> 
+                            <a href="{{ url_for('download_submission', filepath=submission['file_path']) }}" class="btn btn-download">
+                                📥 Download File
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-submissions">
+                <h3>No submissions yet</h3>
+                <p>Students will start submitting their work closer to the due date.</p>
+            </div>
+        {% endif %}
+        
+        <div class="back-link">
+            <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
